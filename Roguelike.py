@@ -2,20 +2,16 @@ import dice
 import pygame
 
 # roguelike stuff
-class Creature: # class for all creatures
-    def __init__(self, hp, sp, mp, ac, rc, fc, wc, speed, gear):
-        self.hp = hp # hit points
-        self.sp = sp # stamina points
-        self.mp = mp # mana points
-        self.ac = ac # armor class
-        self.rc = rc # reflex class
-        self.fc = fc # fortitude class
-        self.wc = wc # will class
-        self.speed = speed # movement speed
-        self.gear = gear # array of gear held by creature
 
-class Creature2: # spitballing different creature definition
-    def __init__(self, str, dex, int, speed, level):
+class Room: # room class
+    def __init__(self, monsters, loot):
+        self.monsters = monsters
+        self.loot = loot
+
+current_room = Room() # initial empty room
+
+class Creature: # Monsters and Players (And NPCs ??? - Later)
+    def __init__(self, str, dex, int, speed, level, gear):
         self.str = str
         self.dex = dex
         self.int = int
@@ -32,14 +28,39 @@ class Creature2: # spitballing different creature definition
         self.mp = (int + 1) * level
         self.wc = 10 + int + level
         self.satk = int + level
+        self.gear = gear
+
+    def damage(self,damage):
+        self.hp -= damage
+        if self.hp <= 0:
+            self.die()
+    def heal(self,heal):
+        self.hp += heal
+        if self.hp > self.maxhp:
+            self.hp = self.maxhp
+    def die(self):
+        # different for subclasses
+        raise NotImplementedError("Subclasses must implement this method")
+
+class Monster(Creature): # class for monsters - subclass of Creature
+    def __init__(self, str, dex, int, speed, level, gear):
+        super().__init__(str, dex, int, speed, level, gear)
+
+    def die(self):
+        for i in self.gear:
+            current_room.loot.append(i) # drop gear into room
 
 
-class Player: # class for player character - subclass of Creature
-    def __init__(self, hp, sp, mp, ac, rc, fc, wc, speed, gear, charclass):
-        super().__init__(hp, sp, mp, ac, rc, fc, wc, speed, gear)
+class Player(Creature): # class for player character - subclass of Creature
+    def __init__(self, str, dex, int, speed, level, charclass, gear):
+        super().__init__(str, dex, int, speed, level, gear)
         self.charclass = charclass
 
-def check(dc, bonus):
+    def die(self):
+        # "you lose" menu
+        pass
+
+def check(bonus, dc):
     roll = dice.roll('1d20') + bonus
     if roll < dc - 10:
         return "Failure" # no effect
