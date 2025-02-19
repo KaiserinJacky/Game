@@ -65,20 +65,23 @@ class Creature: # Monsters and Players (And NPCs ??? - Later)
         self.speed = speed
         self.level = level
         self.ac = 10 # add armor bonus based on gear?
-        self.maxhp = (str + 8) * level # maximum hit points
-        self.hp = (str + 8) * level # current hit points - starts at max
+        self.maxhp = 8 + str * level # maximum hit points
+        self.hp = 8 + str * level # current hit points - starts at max
         self.fc = 10 + str + level # fortitude class
         self.watk = str + level # weapon attack bonus
         self.melee_wdmg = str # weapon damage bonus
-        self.maxsp = (dex + 8) * level # maximum stamina points
-        self.sp = (dex + 8) * level # current stamina points - starts at max
+        self.maxsp = 8 + dex * level # maximum stamina points
+        self.sp = 8 + dex * level # current stamina points - starts at max
         self.rc = 10 + dex + level # reflex class
         self.dex_watk = dex + level # weapon attack bonus for ranged and finesse weapons
-        self.maxmp = (int + 8) * level # maximum mana points
-        self.mp = (int + 8) * level # current mana points - starts at max
+        self.maxmp = 8 + int * level # maximum mana points
+        self.mp = 8 + int * level # current mana points - starts at max
         self.wc = 10 + int + level # will class
         self.satk = int + level # spell attack bonus
         self.gear = gear # list of gear held
+
+    def __str__(self):
+        return f"Str: {self.str} - Dex: {self.dex} - Int: {self.int}\nLevel: {self.level} - Per: {self.per} - Spd: {self.speed}\nHP: {self.hp} - SP: {self.sp} - MP: {self.mp}"
 
     def damage(self,damage):
         self.hp -= damage
@@ -103,8 +106,8 @@ class Monster(Creature): # class for monsters - subclass of Creature
 
 
 class Player(Creature): # class for player character - subclass of Creature
-    def __init__(self, str, dex, int, per_base, speed, level, gear, charclass):
-        super().__init__(str, dex, int, per_base, speed, level, gear)
+    def __init__(self, charclass, level):
+        super().__init__(charclass.str_base, charclass.dex_base, charclass.int_base, charclass.per_base, charclass.speed_base, level, charclass.starting_gear)
         self.charclass = charclass
 
     def die(self):
