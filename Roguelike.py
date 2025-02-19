@@ -57,6 +57,7 @@ class Armor(Gear):
 
 chainmail = Armor("Chainmail", 3, 0, ["Plate"])
 wizard_robes = Armor("Wizard Robes", 0, 0, ["Robe"])
+unarmored = Armor("Unarmored", 0, 0, ["Unarmored"])
 
 class Focus(Gear):
     def __init__(self, name, spells, potency, traits):
@@ -83,7 +84,6 @@ class Creature: # Monsters and Players (And NPCs ??? - Later)
         self.per = per_base + level # perception
         self.speed = speed
         self.level = level
-        self.ac = 10 + level # add armor bonus based on gear?
         self.maxhp = 8 + str * level # maximum hit points
         self.hp = 8 + str * level # current hit points - starts at max
         self.fc = 10 + str + level # fortitude class
@@ -98,8 +98,20 @@ class Creature: # Monsters and Players (And NPCs ??? - Later)
         self.wc = 10 + int + level # will class
         self.satk = int + level # spell attack bonus
         self.gear = gear # list of gear held
+        # initialize equipment
         self.weapon_r = fist
         self.weapon_l = fist
+        self.armor = unarmored
+        # equip starting gear
+        for i in gear:
+            if i.kind == "Weapon" or i.kind == "Focus":
+                if self.weapon_r == fist:
+                    self.weapon_r = i
+                elif self.weapon_l == fist:
+                    self.weapon_l = i
+            if i.kind == "Armor" and self.armor == unarmored:
+                self.armor = i
+        self.ac = 10 + level + self.armor.ac_bonus + self.armor.potency  # armor class
 
     def __str__(self): # useful before we have any UI done
         return f"Str: {self.str} - Dex: {self.dex} - Int: {self.int}\nLevel: {self.level} - Per: {self.per} - Spd: {self.speed}\nHP: {self.hp} - SP: {self.sp} - MP: {self.mp}\nFC: {self.fc} - RC: {self.rc} - WC: {self.wc} - AC: {self.ac}"
@@ -179,7 +191,7 @@ class CharClass: # class for character classes
 
 # define base classes
 soldier = CharClass(3,1,1,2,20,[chainmail, steel_shield, arming_sword])
-sorcerer = CharClass(1,1,3,2,25, ["Basic Wand", wizard_robes])
+sorcerer = CharClass(1,1,3,2,25, [wand_electricity, wizard_robes])
 scoundrel = CharClass(1,3,1,3,30,[knife])
 
 def check(bonus, dc):
@@ -193,5 +205,5 @@ def check(bonus, dc):
     else: # roll >= dc + 10
         return "Critical" # full SP damage, full HP damage, full effect, and bonus effect
 
-player = Player(soldier, 1)
+player = Player(sorcerer, 1)
 print(player)
