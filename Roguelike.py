@@ -7,28 +7,32 @@ class Room: # room class
     def __init__(self, monsters, loot):
         self.monsters = monsters
         self.loot = loot
+        # whatever else is needed for a room; map coords, what rooms it connects to, etc.
+        # not sure yet what we'll need, exactly
 
-current_room = Room() # initial empty room
+current_room = Room("No Monsters", "No Loot") # initial empty room
 
 class Creature: # Monsters and Players (And NPCs ??? - Later)
     def __init__(self, str, dex, int, speed, level, gear):
-        self.str = str
-        self.dex = dex
-        self.int = int
+        self.str = str # strength
+        self.dex = dex # dexterity
+        self.int = int # intelligence
         self.speed = speed
         self.level = level
-        self.maxhp = (str + 1) * level
-        self.hp = (str + 1) * level
-        self.fc = 10 + str + level
-        self.watk = str + level
-        self.melee_wdmg = str
-        self.sp = (dex + 1) * level
-        self.rc = 10 + dex + level
-        self.dex_watk = dex + level
-        self.mp = (int + 1) * level
-        self.wc = 10 + int + level
-        self.satk = int + level
-        self.gear = gear
+        self.maxhp = (str + 1) * level # maximum hit points
+        self.hp = (str + 1) * level # current hit points - starts at max
+        self.fc = 10 + str + level # fortitude class
+        self.watk = str + level # weapon attack bonus
+        self.melee_wdmg = str # weapon damage bonus
+        self.maxsp = (dex + 1) * level # maximum stamina points
+        self.sp = (dex + 1) * level # current stamina points - starts at max
+        self.rc = 10 + dex + level # reflex class
+        self.dex_watk = dex + level # weapon attack bonus for ranged and finesse weapons
+        self.maxmp = (int + 1) * level # maximum mana points
+        self.mp = (int + 1) * level # current mana points - starts at max
+        self.wc = 10 + int + level # will class
+        self.satk = int + level # spell attack bonus
+        self.gear = gear # list of gear held
 
     def damage(self,damage):
         self.hp -= damage
@@ -45,6 +49,7 @@ class Creature: # Monsters and Players (And NPCs ??? - Later)
 class Monster(Creature): # class for monsters - subclass of Creature
     def __init__(self, str, dex, int, speed, level, gear):
         super().__init__(str, dex, int, speed, level, gear)
+        # no extra attributes yet
 
     def die(self):
         for i in self.gear:
