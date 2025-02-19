@@ -46,6 +46,7 @@ class Weapon(Gear):
 arming_sword = Weapon("Arming Sword", '1d8',0, ["Sword"])
 steel_shield = Weapon("Steel Shield", '1d4', 0, ["Shield","Agile"])
 knife = Weapon("Knife", '1d4', 0, ["Knife","Agile","Finesse"])
+fist = Weapon("Fist", '1d4', 0, ["Unarmed", "Agile", "Finesse"])
 
 class Armor(Gear):
     def __init__(self, name, ac_bonus, potency, traits):
@@ -76,6 +77,7 @@ class Artifact: # artifact class
 
 class Creature: # Monsters and Players (And NPCs ??? - Later)
     def __init__(self, str, dex, int, per_base, speed, level, gear):
+        # hp and sp (and mp?) are too low generally. need to find a better formula for them
         self.str = str # strength
         self.dex = dex # dexterity
         self.int = int # intelligence
@@ -97,18 +99,50 @@ class Creature: # Monsters and Players (And NPCs ??? - Later)
         self.wc = 10 + int + level # will class
         self.satk = int + level # spell attack bonus
         self.gear = gear # list of gear held
+        self.weapon_r = fist
+        self.weapon_l = fist
 
     def __str__(self): # useful before we have any UI done
         return f"Str: {self.str} - Dex: {self.dex} - Int: {self.int}\nLevel: {self.level} - Per: {self.per} - Spd: {self.speed}\nHP: {self.hp} - SP: {self.sp} - MP: {self.mp}\nFC: {self.fc} - RC: {self.rc} - WC: {self.wc} - AC: {self.ac}"
 
-    def damage(self,damage):
+    def damage_hp(self,damage):
         self.hp -= damage
         if self.hp <= 0:
             self.die()
+
+    def damage_sp(self,damage):
+        self.sp -= damage
+        if self.sp < 0:
+            self.damage_hp(-self.sp)
+            self.sp = 0
+
+    def strike(self,weapon,target):
+        damage = dice.roll(weapon.damage_die) + self.melee_wdmg
+        to_hit = self.watk
+        if self.dex_watk > self.watk:
+            for i in weapon.traits:  # only use dex if weapon is finesse AND dex attack is higher than str attack
+                if i == "Finesse":
+                    to_hit = self.dex_watk
+        match check(to_hit,target.ac):
+            case "Failure":
+                return 0
+            case "Partial":
+                target.damage_sp(int(0.5 * damage)) # round down with int()
+                return 0
+            case "Success":
+                target.damage_sp(damage)
+                return 0
+            case "Critical":
+                target.damage_sp(damage)
+                target.damage_hp(damage)
+                return 0
+
+
     def heal(self,heal):
         self.hp += heal
         if self.hp > self.maxhp:
             self.hp = self.maxhp
+
     def die(self):
         # different for subclasses
         raise NotImplementedError("Subclasses must implement this method")
@@ -158,3 +192,6 @@ def check(bonus, dc):
         return "Success" # full SP damage and full effect
     else: # roll >= dc + 10
         return "Critical" # full SP damage, full HP damage, full effect, and bonus effect
+
+player = Player(soldier, 1)
+print(player)
