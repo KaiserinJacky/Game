@@ -77,7 +77,6 @@ class Artifact: # artifact class
 
 class Creature: # Monsters and Players (And NPCs ??? - Later)
     def __init__(self, str, dex, int, per_base, speed, level, gear):
-        # hp and sp (and mp?) are too low generally. need to find a better formula for them
         self.str = str # strength
         self.dex = dex # dexterity
         self.int = int # intelligence
@@ -116,7 +115,8 @@ class Creature: # Monsters and Players (And NPCs ??? - Later)
             self.damage_hp(-self.sp)
             self.sp = 0
 
-    def strike(self,weapon,target):
+    def strike(self,weapon,target): # add functionality for ranged weapons and spells.
+                                    # maybe don't check for reach/range here, check in whatever the target select screen is
         damage = dice.roll(weapon.damage_die) + self.melee_wdmg
         to_hit = self.watk
         if self.dex_watk > self.watk:
