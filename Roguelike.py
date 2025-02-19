@@ -129,7 +129,8 @@ class Creature: # Monsters and Players (And NPCs ??? - Later)
 
     def strike(self,weapon,target): # add functionality for ranged weapons and spells.
                                     # maybe don't check for reach/range here, check in whatever the target select screen is
-        damage = dice.roll(weapon.damage_die) + self.melee_wdmg
+        damage = int(dice.roll(weapon.damage_die)) + self.melee_wdmg
+        print(damage)
         to_hit = self.watk
         if self.dex_watk > self.watk:
             for i in weapon.traits:  # only use dex if weapon is finesse AND dex attack is higher than str attack
@@ -168,6 +169,7 @@ class Monster(Creature): # class for monsters - subclass of Creature
         for i in self.gear:
             current_room.loot.append(i) # drop gear into room
 
+goblin = Monster(1,2,1,1,25,0,[])
 
 class Player(Creature): # class for player character - subclass of Creature
     def __init__(self, charclass, level):
@@ -190,20 +192,30 @@ class CharClass: # class for character classes
         self.starting_gear = starting_gear # starting gear for class
 
 # define base classes
-soldier = CharClass(3,1,1,2,20,[chainmail, steel_shield, arming_sword])
+soldier = CharClass(3,1,1,2,20,[chainmail, arming_sword, steel_shield])
 sorcerer = CharClass(1,1,3,2,25, [wand_electricity, wizard_robes])
 scoundrel = CharClass(1,3,1,3,30,[knife])
 
 def check(bonus, dc):
-    roll = dice.roll('1d20') + bonus
+    roll = int(dice.roll('1d20')) + bonus
     if roll < dc - 10:
+        print("Failure")
         return "Failure" # no effect
     elif roll < dc:
+        print("Partial")
         return "Partial" # half SP damage and partial effect
     elif roll >= dc and not roll >= dc + 10: # only if roll >= DC and not a critical
+        print("Success")
         return "Success" # full SP damage and full effect
     else: # roll >= dc + 10
+        print("Critical")
         return "Critical" # full SP damage, full HP damage, full effect, and bonus effect
 
-player = Player(sorcerer, 1)
-print(player)
+player = Player(soldier, 1)
+print(player, "\n")
+
+print(goblin, "\n")
+
+player.strike(player.weapon_r,goblin)
+
+print(goblin, "\n")
