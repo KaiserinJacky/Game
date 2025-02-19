@@ -195,7 +195,8 @@ class Player(Creature): # class for player character - subclass of Creature
     def approach(self, dist):
         for monster in current_room.monsters:
             monster.distance -= dist
-            if monster
+            if monster.dist < 5:
+                monster.dist = 5
 
     def retreat(self, dist):
         for monster in current_room.monsters:
