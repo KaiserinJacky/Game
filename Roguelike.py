@@ -8,7 +8,8 @@ class Room: # room class
         # whatever else is needed for a room; map coords, what rooms it connects to, etc.
         # not sure yet what we'll need, exactly
 
-current_room = Room("No Monsters", "No Loot") # initial empty room
+current_room = Room([], []) # initial empty room
+initial_distance = 25 # initial distance for monsters
 
 class Spell: # spell class
     def __init__(self, name, defense, targets, damage, mana_cost, partial, full, bonus):
@@ -156,6 +157,14 @@ class Creature: # Monsters and Players (And NPCs ??? - Later)
         if self.hp > self.maxhp:
             self.hp = self.maxhp
 
+    def approach(self, dist):
+        # different for subclasses
+        raise NotImplementedError("Subclasses must implement this method")
+
+    def retreat(self, dist):
+        # different for subclasses
+        raise NotImplementedError("Subclasses must implement this method")
+
     def die(self):
         # different for subclasses
         raise NotImplementedError("Subclasses must implement this method")
@@ -163,11 +172,18 @@ class Creature: # Monsters and Players (And NPCs ??? - Later)
 class Monster(Creature): # class for monsters - subclass of Creature
     def __init__(self, str, dex, int, per_base, speed, level, gear):
         super().__init__(str, dex, int, per_base, speed, level, gear)
-        # no extra attributes yet
+        self.distance = initial_distance # distance from player
+
+    def approach(self, dist):
+        self.distance -= dist
+        if self.distance < 5:
+            self.distance = 5
+
+    def retreat(self, dist):
+        self.distance += dist
 
     def die(self):
-        for i in self.gear:
-            current_room.loot.append(i) # drop gear into room
+        current_room.loot.extend(self.gear)
 
 goblin = Monster(1,2,1,1,25,0,[])
 
@@ -175,6 +191,16 @@ class Player(Creature): # class for player character - subclass of Creature
     def __init__(self, charclass, level):
         super().__init__(charclass.str_base, charclass.dex_base, charclass.int_base, charclass.per_base, charclass.speed_base, level, charclass.starting_gear)
         self.charclass = charclass
+
+    def approach(self, dist):
+        for monster in current_room.monsters:
+            monster.distance -= dist
+            if monster
+
+    def retreat(self, dist):
+        for monster in current_room.monsters:
+            monster.distance += dist
+
 
     def die(self):
         # "you lose" menu
@@ -212,10 +238,8 @@ def check(bonus, dc):
         return "Critical" # full SP damage, full HP damage, full effect, and bonus effect
 
 player = Player(soldier, 1)
-print(player, "\n")
+current_room.monsters.append(goblin)
+print(current_room.monsters[0].distance)
+current_room.monsters[0].retreat(15)
+print(current_room.monsters[0].distance)
 
-print(goblin, "\n")
-
-player.strike(player.weapon_r,goblin)
-
-print(goblin, "\n")
