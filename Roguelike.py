@@ -183,7 +183,8 @@ class Monster(Creature): # class for monsters - subclass of Creature
         self.distance += dist
 
     def die(self):
-        current_room.loot.extend(self.gear)
+        current_room.loot.extend(self.gear) # add gear to room as loot
+        current_room.monsters.remove(self) # remove self from room
 
 goblin = Monster(1,2,1,1,25,0,[])
 
@@ -237,10 +238,4 @@ def check(bonus, dc):
     else: # roll >= dc + 10
         print("Critical")
         return "Critical" # full SP damage, full HP damage, full effect, and bonus effect
-
-player = Player(soldier, 1)
-current_room.monsters.append(goblin)
-print(current_room.monsters[0].distance)
-current_room.monsters[0].retreat(15)
-print(current_room.monsters[0].distance)
 
