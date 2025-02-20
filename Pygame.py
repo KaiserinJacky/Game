@@ -2,7 +2,7 @@
 import pygame # pygame library
 from enum import Enum
 
-class Area(Enum):
+class Area(Enum): # idk how different enums in python are from enums in c++, so idk if this is the best option for menus and such
     MENU = 1
     MAP = 2
     COMBAT = 3
