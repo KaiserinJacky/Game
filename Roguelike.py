@@ -83,6 +83,7 @@ class Creature: # Monsters and Players (And NPCs ??? - Later)
         self.dex = dex # dexterity
         self.int = int # intelligence
         self.per = per_base + level # perception
+        self.id = int + level # identify skill
         self.speed = speed
         self.level = level
         self.maxhp = 8 + str * level # maximum hit points
